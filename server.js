@@ -56,9 +56,9 @@ function trendingHandler(req, res) {
 function addMoviesHandler(req, res) {
     const movieadded = req.body;
     console.log(movieadded);
-    const sql = `INSERT INTO addedmv (title, release_date , poster_path, overview )
-    VALUES ($1, $2,$3,$4);`
-    const values = [movieadded.title , movieadded.release_date,movieadded.poster_path,movieadded.overview]; 
+    const sql = `INSERT INTO addedmv (title, release_date , poster_path, overview,comment )
+    VALUES ($1, $2,$3,$4,$5);`
+    const values = [movieadded.title , movieadded.release_date,movieadded.poster_path,movieadded.overview,movieadded.comment]; 
     client.query(sql,values)
     .then(data=>{
         res.send("sent");
