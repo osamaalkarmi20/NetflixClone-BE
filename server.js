@@ -16,7 +16,9 @@ server.use(express.json());
 
 server.get('/trending', trendingHandler)
 server.post('/addMovies',addMoviesHandler)
-
+server.get('/getMovies', getMoviesHandler)
+server.delete('/DELETE/:id',deleteMoviesHandler)
+server.put('/UPDATE/:id',updateFavlisthandler)
 //////////////////////////////////////////////////////////////////////////////
 //ERROR SERVICES /////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -68,6 +70,62 @@ function addMoviesHandler(req, res) {
     })
 
    
+}
+function getMoviesHandler(req, res) {
+    const sql = `SELECT * FROM addedmv`;
+    client.query(sql)
+    .then(data=>{
+        res.send(data.rows);
+    })
+
+    .catch((error)=>{
+        errorHandler(error,req,res)
+    })
+}
+function deleteMoviesHandler(req,res){
+    const id = req.params.id;
+    console.log(req.params);
+    const sql = `DELETE FROM addedmv WHERE id=${id} RETURNING *;`
+    client.query(sql)
+    .then(data=>{
+        const sql = `SELECT * FROM addedmv`;
+        client.query(sql)
+        .then(data=>{
+            res.send(data);
+        })
+    
+        .catch((error)=>{
+            errorHandler(error,req,res)
+        })
+    }
+
+    )
+    .catch((error)=>{
+        errorHandler(error,req,res)
+    })
+}
+function updateFavlisthandler(req, res) {
+    const id = req.params.id;
+    const updateFavlist = req.body;
+    const sql = `UPDATE addedmv
+    SET comment = $1
+    WHERE id = ${id} RETURNING *;`;
+    const values = [updateFavlist.comment];
+    client.query(sql, values)
+        .then(data => {
+            const sql = `SELECT * FROM addedmv;`;
+            client.query(sql)
+        .then(data=>{
+            res.send(data);
+        })
+    
+        .catch((error)=>{
+            errorHandler(error,req,res)
+        })
+        })
+        .catch(error => {
+            console.log(error)
+        })
 }
 function error500Handler(req, res) {
     let error500 = {
